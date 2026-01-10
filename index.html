@@ -1349,6 +1349,7 @@ async function setupStripePayment() {
     
     const elements = stripe.elements();
     cardElement = elements.create('card', {
+        hidePostalCode: true,
         style: {
             base: {
                 color: '#f5f5f5',

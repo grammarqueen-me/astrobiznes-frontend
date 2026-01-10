@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
     
     <style>
         * {
@@ -40,7 +41,6 @@
             padding: 0 40px;
         }
 
-        /* Stars */
         .stars-container {
             position: fixed;
             top: 0;
@@ -92,7 +92,6 @@
             100% { transform: translateX(300px) translateY(300px); opacity: 0; }
         }
 
-        /* Navigation */
         nav {
             position: fixed;
             top: 0;
@@ -137,7 +136,6 @@
             color: var(--gold);
         }
 
-        /* Hero */
         .hero {
             padding: 180px 0 80px;
             position: relative;
@@ -203,7 +201,6 @@
             font-size: 0.95rem;
         }
 
-        /* Services */
         .services {
             padding: 100px 0;
             position: relative;
@@ -320,7 +317,11 @@
             transform: translateY(-2px);
         }
 
-        /* Why Astrology */
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .why-astro {
             padding: 100px 0;
             position: relative;
@@ -363,7 +364,6 @@
             line-height: 1.8;
         }
 
-        /* About */
         .about {
             padding: 100px 0;
             background: var(--dark-gray);
@@ -400,7 +400,6 @@
             font-size: 1.1rem;
         }
 
-        /* Footer */
         footer {
             padding: 60px 0;
             background: var(--black);
@@ -420,7 +419,6 @@
             color: var(--gold);
         }
 
-        /* Modals */
         .modal, .service-details-modal {
             display: none;
             position: fixed;
@@ -479,18 +477,15 @@
             margin-bottom: 15px;
         }
 
-        .modal p, .service-details-content p {
+        .modal p, .service-details-content p, .modal ul, .service-details-content ul {
             line-height: 1.8;
             margin-bottom: 20px;
         }
 
         .modal ul, .service-details-content ul {
             margin-left: 25px;
-            margin-bottom: 20px;
-            line-height: 1.8;
         }
 
-        /* Order Form */
         .delivery-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -566,42 +561,52 @@
             border-color: var(--gold);
         }
 
-        .payment-section {
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .progress-step {
+            padding: 10px 20px;
             background: var(--medium-gray);
-            padding: 30px;
-            margin: 30px 0;
-            border-left: 4px solid var(--gold);
+            color: var(--text-gray);
+            border: 2px solid var(--light-gray);
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.9rem;
         }
 
-        .payment-section h3 {
-            margin-top: 0;
-        }
-
-        .card-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 20px;
+        .progress-step.active {
             background: var(--gold);
             color: var(--black);
-            border: none;
-            font-family: 'Oswald', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 30px;
+            border-color: var(--gold);
         }
 
-        .submit-btn:hover {
-            background: var(--white);
-            transform: translateY(-3px);
+        .progress-step.completed {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        #card-element {
+            padding: 15px;
+            background: var(--medium-gray);
+            border: 2px solid var(--light-gray);
+            margin-bottom: 20px;
+        }
+
+        #card-errors {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-size: 0.9rem;
         }
 
         .success-message {
@@ -651,12 +656,12 @@
                 grid-template-columns: 1fr;
             }
             
-            .card-inputs {
-                grid-template-columns: 1fr;
-            }
-            
             .modal-content, .service-details-content {
                 padding: 30px;
+            }
+
+            .progress-steps {
+                flex-direction: column;
             }
         }
     </style>
@@ -680,7 +685,7 @@
         <div class="container">
             <div class="hero-content">
                 <h1>Strategiczne decyzje<br>w <span>optymalnym</span> momencie</h1>
-                <p>Profesjonalna astrologia biznesowa dla mężczyzn, którzy nie zostawiają sukcesu przypadkowi. Konkretne daty, precyzyjne analizy, wymierne rezultaty w karierze i życiu.</p>
+                <p>Profesjonalna astrologia biznesowa dla osób, które nie zostawiają sukcesu przypadkowi. Konkretne daty, precyzyjne analizy, wymierne rezultaty w karierze i życiu.</p>
             </div>
             <div class="hero-stats">
                 <div class="stat">
@@ -708,8 +713,8 @@
 
             <div class="services-grid">
                 <div class="service-card" onclick="showServiceDetails('career')">
-                    <h3>💼 Kariera & Awans</h3>
-                    <p>Strategiczny timing dla podwyżki, awansu lub zmiany pracy. Konkretne daty na kluczowe rozmowy i decyzje zawodowe.</p>
+                    <h3>Kariera i awans</h3>
+                    <p>Strategiczny timing dla kluczowych decyzji zawodowych.</p>
                     <div class="service-price">
                         <div class="price-option">
                             <div class="price-label">Standard (24h)</div>
@@ -720,12 +725,12 @@
                             <div class="price-value">200 <small>zł</small></div>
                         </div>
                     </div>
-                    <button class="btn" onclick="event.stopPropagation(); openModal('career')">Zamów Analizę</button>
+                    <button class="btn" onclick="event.stopPropagation(); showServiceDetails('career')">Zobacz Szczegóły</button>
                 </div>
 
                 <div class="service-card" onclick="showServiceDetails('startup')">
-                    <h3>🚀 Startup & Biznes</h3>
-                    <p>Optymalny moment na launch, fundraising, ekspansję. Strategiczny kalendarz biznesowy dopasowany do cykli kosmicznych.</p>
+                    <h3>Startup & Biznes</h3>
+                    <p>Optymalny timing dla uruchomienia i rozwoju przedsięwzięć biznesowych.</p>
                     <div class="service-price">
                         <div class="price-option">
                             <div class="price-label">Standard (24h)</div>
@@ -736,12 +741,12 @@
                             <div class="price-value">350 <small>zł</small></div>
                         </div>
                     </div>
-                    <button class="btn" onclick="event.stopPropagation(); openModal('startup')">Zamów Analizę</button>
+                    <button class="btn" onclick="event.stopPropagation(); showServiceDetails('startup')">Zobacz Szczegóły</button>
                 </div>
 
                 <div class="service-card" onclick="showServiceDetails('finance')">
-                    <h3>💰 Inwestycje</h3>
-                    <p>Optymalne okna czasowe dla inwestycji. Okresy wysokiego i niskiego ryzyka w Twoim osobistym cyklu finansowym.</p>
+                    <h3>Inwestycje</h3>
+                    <p>Optymalne okna czasowe dla decyzji inwestycyjnych i finansowych.</p>
                     <div class="service-price">
                         <div class="price-option">
                             <div class="price-label">Standard (24h)</div>
@@ -752,12 +757,12 @@
                             <div class="price-value">275 <small>zł</small></div>
                         </div>
                     </div>
-                    <button class="btn" onclick="event.stopPropagation(); openModal('finance')">Zamów Analizę</button>
+                    <button class="btn" onclick="event.stopPropagation(); showServiceDetails('finance')">Zobacz Szczegóły</button>
                 </div>
 
                 <div class="service-card" onclick="showServiceDetails('leadership')">
-                    <h3>👔 Leadership & Zarządzanie</h3>
-                    <p>Timing dla kluczowych decyzji personalnych, restrukturyzacji, zmian strategicznych. Zarządzanie zgodne z cyklami energetycznymi.</p>
+                    <h3>Leadership i zarządzanie</h3>
+                    <p>Timing dla decyzji personalnych i strategicznych zmian organizacyjnych.</p>
                     <div class="service-price">
                         <div class="price-option">
                             <div class="price-label">Standard (24h)</div>
@@ -768,12 +773,12 @@
                             <div class="price-value">250 <small>zł</small></div>
                         </div>
                     </div>
-                    <button class="btn" onclick="event.stopPropagation(); openModal('leadership')">Zamów Analizę</button>
+                    <button class="btn" onclick="event.stopPropagation(); showServiceDetails('leadership')">Zobacz Szczegóły</button>
                 </div>
 
                 <div class="service-card" onclick="showServiceDetails('mission')">
-                    <h3>⚡ Męskość & Życiowa Misja</h3>
-                    <p>Odkryj swoją prawdziwą ścieżkę. Analiza życiowego powołania, naturalnych talentów i optymalnego kierunku rozwoju.</p>
+                    <h3>Rozwój i misja</h3>
+                    <p>Odkrycie życiowego powołania i optymalnej ścieżki rozwoju zawodowego.</p>
                     <div class="service-price">
                         <div class="price-option">
                             <div class="price-label">Standard (24h)</div>
@@ -784,7 +789,7 @@
                             <div class="price-value">200 <small>zł</small></div>
                         </div>
                     </div>
-                    <button class="btn" onclick="event.stopPropagation(); openModal('mission')">Zamów Analizę</button>
+                    <button class="btn" onclick="event.stopPropagation(); showServiceDetails('mission')">Zobacz Szczegóły</button>
                 </div>
             </div>
         </div>
@@ -832,7 +837,7 @@
                 
                 <p>Przez kolejne trzy lata zgłębialiśmy tę wiedzę, łącząc starożytną mądrość wedyjską z zachodnią astrologią biznesową. Studiowaliśmy pod okiem mistrzów w Indiach i ekspertów w Europie. Połączyliśmy to z naszym doświadczeniem przedsiębiorców - bo wiemy, że biznesmen potrzebuje konkretów, nie ogólników.</p>
                 
-                <p>AstroBiznes.Pro to nie ezoteryka. To narzędzie strategiczne dla mężczyzn, którzy chcą mieć każdą możliwą przewagę konkurencyjną. Nie mówimy, że astrologia gwarantuje sukces - ale daje Ci wiedzę o optymalnym timingu, Twoich naturalnych predyspozycjach i cyklach energetycznych, które wpływają na Twój biznes.</p>
+                <p>AstroBiznes.Pro to nie ezoteryka. To narzędzie strategiczne dla osób, które chcą mieć każdą możliwą przewagę konkurencyjną. Nie mówimy, że astrologia gwarantuje sukces - ale daje Ci wiedzę o optymalnym timingu, Twoich naturalnych predyspozycjach i cyklach energetycznych, które wpływają na Twój biznes.</p>
                 
                 <div class="signature">
                     - Marek i Piotr, Założyciele AstroBiznes.Pro
@@ -860,21 +865,29 @@
         </div>
     </footer>
 
+    <!-- Service Details Modal -->
     <div class="service-details-modal" id="serviceDetailsModal">
         <div class="service-details-content">
             <span class="close-modal" onclick="closeServiceDetails()">×</span>
             <div id="serviceDetailsContent"></div>
-            <button class="btn" onclick="closeServiceDetailsAndOrder()" style="margin-top: 40px;">Zamów Tę Analizę</button>
+            <button class="btn" onclick="startOrder()" style="margin-top: 40px;">Złóż Zamówienie</button>
         </div>
     </div>
 
+    <!-- Order Modal with 3 steps -->
     <div class="modal" id="orderModal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">×</span>
             
-            <div id="orderForm">
+            <div class="progress-steps">
+                <div class="progress-step" id="step1Indicator">1. Opcje dostawy</div>
+                <div class="progress-step" id="step2Indicator">2. Dane i pytania</div>
+                <div class="progress-step" id="step3Indicator">3. Płatność</div>
+            </div>
+
+            <!-- Step 1: Delivery Selection -->
+            <div class="step active" id="step1">
                 <h2 id="modalTitle">Zamów Analizę</h2>
-                
                 <h3>Wybierz opcję dostawy</h3>
                 <div class="delivery-options">
                     <div class="delivery-option selected" onclick="selectDelivery('standard')">
@@ -888,8 +901,13 @@
                         <div class="delivery-price" id="expressPrice">200 zł</div>
                     </div>
                 </div>
+                <button class="btn" onclick="nextStep(2)">Dalej</button>
+            </div>
 
-                <form id="analysisForm">
+            <!-- Step 2: Form -->
+            <div class="step" id="step2">
+                <h2>Dane osobowe i pytania</h2>
+                <form id="analysisForm" onsubmit="return false;">
                     <div class="form-group">
                         <label>Imię i Nazwisko *</label>
                         <input type="text" id="fullName" required>
@@ -917,38 +935,34 @@
 
                     <div id="serviceQuestions"></div>
 
-                    <div class="payment-section">
-                        <h3>💳 Płatność</h3>
-                        <div class="form-group">
-                            <label>Numer karty</label>
-                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
-                        </div>
-                        <div class="card-inputs">
-                            <div class="form-group">
-                                <label>Data ważności</label>
-                                <input type="text" id="cardExpiry" placeholder="MM/RR" maxlength="5" required>
-                            </div>
-                            <div class="form-group">
-                                <label>CVV</label>
-                                <input type="text" id="cardCvv" placeholder="123" maxlength="3" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Kwota</label>
-                                <input type="text" id="totalPrice" readonly style="font-weight: 600; color: var(--gold);">
-                            </div>
-                        </div>
-                        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
-                            🔒 Płatność zabezpieczona. To mockup dla demo - dane nie są przechowywane.
-                        </p>
-                    </div>
-
-                    <button type="submit" class="submit-btn">Zamów i Zapłać</button>
+                    <button type="button" class="btn" onclick="nextStep(3)" style="margin-top: 20px;">Przejdź do płatności</button>
                 </form>
             </div>
 
+            <!-- Step 3: Payment -->
+            <div class="step" id="step3">
+                <h2>Płatność</h2>
+                <div style="background: var(--medium-gray); padding: 30px; margin-bottom: 30px; border-left: 4px solid var(--gold);">
+                    <h3 style="margin-top: 0;">Podsumowanie zamówienia</h3>
+                    <p><strong>Usługa:</strong> <span id="summaryService"></span></p>
+                    <p><strong>Dostawa:</strong> <span id="summaryDelivery"></span></p>
+                    <p style="font-size: 1.5rem; color: var(--gold); margin-top: 20px;"><strong>Do zapłaty: <span id="summaryPrice"></span> zł</strong></p>
+                </div>
+
+                <h3>Dane karty</h3>
+                <div id="card-element"></div>
+                <div id="card-errors" role="alert"></div>
+
+                <button id="submit-payment" class="btn" style="margin-top: 30px;">
+                    <span id="button-text">Zapłać i zamów</span>
+                    <span id="spinner" style="display: none;">⏳ Przetwarzanie...</span>
+                </button>
+            </div>
+
+            <!-- Success Message -->
             <div class="success-message" id="successMessage">
                 <div class="success-icon">✓</div>
-                <h3>Zamówienie Przyjęte!</h3>
+                <h3>Płatność Potwierdzona!</h3>
                 <p>Twoje zamówienie zostało zarejestrowane pod numerem <strong id="orderNumber"></strong>.</p>
                 <p style="margin-top: 20px;">Otrzymasz email z potwierdzeniem na adres: <strong id="confirmEmail"></strong></p>
                 <p style="margin-top: 20px; color: var(--gold); font-size: 1.3rem;">
@@ -962,6 +976,7 @@
         </div>
     </div>
 
+    <!-- Privacy Modal -->
     <div class="modal" id="privacyModal">
         <div class="modal-content" style="max-width: 1000px;">
             <span class="close-modal" onclick="closePrivacyPolicy()">×</span>
@@ -989,6 +1004,7 @@
         </div>
     </div>
 
+    <!-- Terms Modal -->
     <div class="modal" id="termsModal">
         <div class="modal-content" style="max-width: 1000px;">
             <span class="close-modal" onclick="closeTermsOfService()">×</span>
@@ -1016,150 +1032,134 @@
     </div>
 
     <script>
-
 const API_URL = 'https://astrobiznes-pro-production.up.railway.app/api';
+const STRIPE_KEY = 'pk_test_51So0sRRRWC7sUEMZD5SrqOcmTKBAXWL1hBhppUZ0mjoy4pIkboDjHncoGfmdJ3zyYb6vNkuuIS62FxNTI2Yw8g8Z00HTdYOrXm';
+
+const stripe = Stripe(STRIPE_KEY);
+let cardElement;
+let clientSecret;
 
 const servicesData = {
     career: {
-        title: 'Kariera & Awans',
+        title: 'Kariera i awans',
         standardPrice: 150,
         expressPrice: 200,
-        icon: '💼',
         detailedDescription: {
-            forWhom: `Ta analiza jest dla Ciebie, jeśli:
-                • Planujesz rozmowę o podwyżkę lub awans
-                • Rozważasz zmianę pracy lub branży
-                • Chcesz założyć własną firmę, ale nie wiesz kiedy
-                • Stosujesz przed ważną negocjacją zawodową
-                • Czujesz, że utknąłeś w karierze i szukasz impulsu`,
-            whatYouGet: `Otrzymasz profesjonalną analizę astrologiczną (1200-1500 słów) zawierającą:
-                
-                1. ANALIZA PREDYSPOZYCJI ZAWODOWYCH
-                2. KONKRETNE DATY I TIMING
-                3. AKTUALNE TRANZYTY PLANETARNE
-                4. STRATEGICZNE REKOMENDACJE`,
-            format: `Analiza w formie profesjonalnego dokumentu PDF lub emaila (1200-1500 słów), napisana profesjonalnym językiem.`
+            forWhom: `DLA KOGO:
+• Osoby planujące rozmowę o podwyżkę lub awans
+• Profesjonaliści rozważający zmianę pracy lub branży
+• Przedsiębiorcy przed ważnymi negocjacjami`,
+            whatYouGet: `CO OTRZYMASZ:
+• Analizę predyspozycji zawodowych (1200-1500 słów)
+• Konkretne daty optymalnych działań
+• Strategiczne rekomendacje działania`,
+            format: `DOSTAWA: Standard 24h | Ekspres 2h`
         },
         questions: [
-            { id: 'q1', label: 'Jaka jest Twoja obecna sytuacja zawodowa?', type: 'textarea' },
-            { id: 'q2', label: 'Jaki konkretny cel chcesz osiągnąć?', type: 'textarea' },
-            { id: 'q3', label: 'Jaki jest Twój timeline?', type: 'text' },
-            { id: 'q4', label: 'Jakie są główne przeszkody?', type: 'textarea' },
-            { id: 'q5', label: 'Co jest dla Ciebie najważniejsze w karierze?', type: 'textarea' }
+            { id: 'q1', label: 'Jaka jest Twoja obecna sytuacja zawodowa? (stanowisko, branża, staż)', type: 'textarea' },
+            { id: 'q2', label: 'Jaki konkretny cel chcesz osiągnąć? (podwyżka X%, awans na stanowisko Y, zmiana firmy)', type: 'textarea' },
+            { id: 'q3', label: 'W jakim czasie chcesz to zrealizować? (3 mies, 6 mies, 12 mies)', type: 'text' },
+            { id: 'q4', label: 'Jakie widzisz główne przeszkody? (brak doświadczenia, konkurencja, sytuacja w firmie)', type: 'textarea' },
+            { id: 'q5', label: 'Czy masz już zaplanowane konkretne działania? (rozmowa zaplanowana, CV wysłane, itp.)', type: 'textarea' }
         ]
     },
     startup: {
         title: 'Startup & Biznes',
         standardPrice: 250,
         expressPrice: 350,
-        icon: '🚀',
         detailedDescription: {
-            forWhom: `Ta analiza jest dla Ciebie, jeśli:
-                • Planujesz uruchomienie startupu
-                • Stosujesz przed fundraisingiem
-                • Rozważasz ekspansję biznesu
-                • Podejmujesz kluczowe decyzje strategiczne`,
-            whatYouGet: `Otrzymasz kompleksową analizę strategiczną (1500-1800 słów) zawierającą:
-                
-                1. ANALIZA PREDYSPOZYCJI DO BIZNESU
-                2. STRATEGICZNY KALENDARZ BIZNESOWY
-                3. ANALIZA RYZYKA I CYKLI
-                4. PROGNOZY FINANSOWE`,
-            format: `Analiza w formie profesjonalnego dokumentu (1500-1800 słów).`
+            forWhom: `DLA KOGO:
+• Osoby planujące uruchomienie startupu
+• Przedsiębiorcy przed fundraisingiem
+• Firmy planujące ekspansję lub pivot`,
+            whatYouGet: `CO OTRZYMASZ:
+• Analizę predyspozycji biznesowych (1500-1800 słów)
+• Strategiczny kalendarz biznesowy z datami
+• Analizę ryzyka i długoterminowe prognozy`,
+            format: `DOSTAWA: Standard 24h | Ekspres 2h`
         },
         questions: [
-            { id: 'q1', label: 'Opisz swój biznes lub pomysł', type: 'textarea' },
-            { id: 'q2', label: 'Na jakim jesteś etapie?', type: 'textarea' },
-            { id: 'q3', label: 'Jakie są kluczowe decyzje przed Tobą?', type: 'textarea' },
-            { id: 'q4', label: 'Jaki jest Twój timeline?', type: 'text' },
-            { id: 'q5', label: 'Jakie są Twoje główne obawy?', type: 'textarea' }
+            { id: 'q1', label: 'Opisz swój biznes lub pomysł biznesowy (branża, model, etap)', type: 'textarea' },
+            { id: 'q2', label: 'Jaki jest Twój główny cel biznesowy? (launch, fundraising, ekspansja, pivot)', type: 'textarea' },
+            { id: 'q3', label: 'Jaki jest Twój timeline? (kiedy planujesz uruchomienie/skalowanie)', type: 'text' },
+            { id: 'q4', label: 'Jakie są kluczowe wyzwania przed którymi stoisz? (kapitał, zespół, rynek, technologia)', type: 'textarea' },
+            { id: 'q5', label: 'Jakie decyzje musisz podjąć w najbliższym czasie? (zatrudnienie, inwestycja, zmiana strategii)', type: 'textarea' }
         ]
     },
     finance: {
         title: 'Inwestycje',
         standardPrice: 200,
         expressPrice: 275,
-        icon: '💰',
         detailedDescription: {
-            forWhom: `Ta analiza jest dla Ciebie, jeśli:
-                • Inwestujesz na giełdzie lub w kryptowaluty
-                • Planujesz większe inwestycje finansowe
-                • Chcesz znać optymalne momenty na wejście/wyjście
-                • Zarządzasz portfelem inwestycyjnym`,
-            whatYouGet: `Otrzymasz szczegółową analizę finansową (1200-1500 słów) zawierającą:
-                
-                1. TWÓJ PROFIL INWESTORA
-                2. OKNA CZASOWE DLA INWESTYCJI
-                3. OKRESY RYZYKA
-                4. DŁUGOTERMINOWE PROGNOZY`,
-            format: `Analiza w formie profesjonalnego dokumentu (1200-1500 słów).`
+            forWhom: `DLA KOGO:
+• Inwestorzy giełdowi i kryptowalutowi
+• Osoby planujące większe inwestycje finansowe
+• Zarządzający portfelami inwestycyjnymi`,
+            whatYouGet: `CO OTRZYMASZ:
+• Profil inwestora i predyspozycje (1200-1500 słów)
+• Optymalne okna czasowe dla inwestycji
+• Analizę okresów ryzyka i długoterminowe prognozy`,
+            format: `DOSTAWA: Standard 24h | Ekspres 2h`
         },
         questions: [
-            { id: 'q1', label: 'Jakie masz doświadczenie inwestycyjne?', type: 'textarea' },
-            { id: 'q2', label: 'W co planujesz inwestować?', type: 'textarea' },
-            { id: 'q3', label: 'Jaki jest Twój horyzont czasowy?', type: 'text' },
-            { id: 'q4', label: 'Jaki kapitał planujesz zaangażować?', type: 'text' },
-            { id: 'q5', label: 'Jakie masz cele finansowe?', type: 'textarea' }
+            { id: 'q1', label: 'Jakie masz doświadczenie inwestycyjne? (początkujący, średniozaawansowany, zaawansowany)', type: 'textarea' },
+            { id: 'q2', label: 'W co planujesz inwestować? (akcje, krypto, nieruchomości, inne)', type: 'textarea' },
+            { id: 'q3', label: 'Jaki kapitał planujesz zaangażować? (zakres kwotowy)', type: 'text' },
+            { id: 'q4', label: 'Jaki jest Twój horyzont inwestycyjny? (krótkoterminowy <1 rok, średnioterminowy 1-5 lat, długoterminowy >5 lat)', type: 'text' },
+            { id: 'q5', label: 'Jakie są Twoje cele finansowe? (konkretna kwota, pasywny dochód, zabezpieczenie emerytalne)', type: 'textarea' }
         ]
     },
     leadership: {
-        title: 'Leadership & Zarządzanie',
+        title: 'Leadership i zarządzanie',
         standardPrice: 180,
         expressPrice: 250,
-        icon: '👔',
         detailedDescription: {
-            forWhom: `Ta analiza jest dla Ciebie, jeśli:
-                • Zarządzasz zespołem lub firmą
-                • Podejmujesz decyzje personalne
-                • Planujesz restrukturyzację
-                • Chcesz poprawić efektywność zarządzania`,
-            whatYouGet: `Otrzymasz analizę przywódczą (1200-1500 słów) zawierającą:
-                
-                1. TWÓJ STYL PRZYWÓDZTWA
-                2. TIMING DECYZJI PERSONALNYCH
-                3. ZARZĄDZANIE ZESPOŁEM
-                4. STRATEGIA ROZWOJU`,
-            format: `Analiza w formie profesjonalnego dokumentu (1200-1500 słów).`
+            forWhom: `DLA KOGO:
+• Menedżerowie i liderzy zespołów
+• Osoby podejmujące decyzje personalne
+• Organizacje planujące restrukturyzację`,
+            whatYouGet: `CO OTRZYMASZ:
+• Analizę stylu przywództwa (1200-1500 słów)
+• Timing decyzji personalnych i organizacyjnych
+• Strategię zarządzania zgodną z cyklami energetycznymi`,
+            format: `DOSTAWA: Standard 24h | Ekspres 2h`
         },
         questions: [
-            { id: 'q1', label: 'Jaka jest Twoja rola w organizacji?', type: 'textarea' },
-            { id: 'q2', label: 'Ile osób zarządzasz?', type: 'text' },
-            { id: 'q3', label: 'Jakie wyzwania napotykasz?', type: 'textarea' },
-            { id: 'q4', label: 'Jakie decyzje planujesz?', type: 'textarea' },
-            { id: 'q5', label: 'Jaki jest Twój styl zarządzania?', type: 'textarea' }
+            { id: 'q1', label: 'Jaka jest Twoja rola w organizacji? (stanowisko, zakres odpowiedzialności)', type: 'textarea' },
+            { id: 'q2', label: 'Ile osób zarządzasz? (bezpośrednio i pośrednio)', type: 'text' },
+            { id: 'q3', label: 'Jakie wyzwania zarządcze przed Tobą stają? (konflikty, rotacja, efektywność)', type: 'textarea' },
+            { id: 'q4', label: 'Jakie decyzje personalne planujesz? (zatrudnienia, awanse, zwolnienia, reorganizacja)', type: 'textarea' },
+            { id: 'q5', label: 'Jaki jest Twój styl zarządzania? (demokratyczny, autokratyczny, coaching, itp.)', type: 'textarea' }
         ]
     },
     mission: {
-        title: 'Męskość & Życiowa Misja',
+        title: 'Rozwój i misja',
         standardPrice: 150,
         expressPrice: 200,
-        icon: '⚡',
         detailedDescription: {
-            forWhom: `Ta analiza jest dla Ciebie, jeśli:
-                • Szukasz swojej życiowej misji
-                • Chcesz zrozumieć swoje powołanie
-                • Rozwijasz swoją męskość
-                • Stawiasz na rozwój osobisty`,
-            whatYouGet: `Otrzymasz głęboką analizę życiową (1200-1500 słów) zawierającą:
-                
-                1. TWOJA ŻYCIOWA MISJA
-                2. NATURALNE TALENTY
-                3. ŚCIEŻKA ROZWOJU
-                4. ARCHETYP MĘSKOŚCI`,
-            format: `Analiza w formie profesjonalnego dokumentu (1200-1500 słów).`
+            forWhom: `DLA KOGO:
+• Osoby poszukujące życiowego powołania
+• Profesjonaliści w punkcie zwrotnym kariery
+• Ludzie stawiający na rozwój osobisty`,
+            whatYouGet: `CO OTRZYMASZ:
+• Analizę życiowej misji i powołania (1200-1500 słów)
+• Mapę naturalnych talentów i predyspozycji
+• Optymalną ścieżkę rozwoju zawodowego`,
+            format: `DOSTAWA: Standard 24h | Ekspres 2h`
         },
         questions: [
-            { id: 'q1', label: 'Czym się obecnie zajmujesz?', type: 'textarea' },
-            { id: 'q2', label: 'Czego szukasz w życiu?', type: 'textarea' },
-            { id: 'q3', label: 'Jakie masz pasje i zainteresowania?', type: 'textarea' },
-            { id: 'q4', label: 'Co Cię frustruje?', type: 'textarea' },
-            { id: 'q5', label: 'Jak wyobrażasz sobie idealne życie?', type: 'textarea' }
+            { id: 'q1', label: 'Czym obecnie się zajmujesz zawodowo?', type: 'textarea' },
+            { id: 'q2', label: 'Czego szukasz w życiu zawodowym? (znaczenie, spełnienie, konkretny cel)', type: 'textarea' },
+            { id: 'q3', label: 'Jakie masz pasje i zainteresowania poza pracą?', type: 'textarea' },
+            { id: 'q4', label: 'Co Cię frustruje w obecnej sytuacji?', type: 'textarea' },
+            { id: 'q5', label: 'Jak wyobrażasz sobie idealne życie zawodowe za 5 lat?', type: 'textarea' }
         ]
     }
 };
 
 let currentService = null;
 let selectedDelivery = 'standard';
+let currentStep = 1;
 
 function createStars() {
     const container = document.getElementById('starsContainer');
@@ -1238,15 +1238,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function showServiceDetails(serviceType) {
+    currentService = serviceType;
     const service = servicesData[serviceType];
     const content = `
-        <h2>${service.icon} ${service.title}</h2>
-        <h3>Dla kogo?</h3>
-        <p style="white-space: pre-line;">${service.detailedDescription.forWhom}</p>
-        <h3>Co otrzymasz?</h3>
-        <p style="white-space: pre-line;">${service.detailedDescription.whatYouGet}</p>
-        <h3>Format</h3>
-        <p>${service.detailedDescription.format}</p>
+        <h2>${service.title}</h2>
+        <p style="white-space: pre-line; font-size: 1.1rem; margin-bottom: 30px;">${service.detailedDescription.forWhom}</p>
+        <p style="white-space: pre-line; font-size: 1.1rem; margin-bottom: 30px;">${service.detailedDescription.whatYouGet}</p>
+        <p style="white-space: pre-line; font-size: 1.1rem; margin-bottom: 30px;">${service.detailedDescription.format}</p>
         <div class="service-price" style="margin-top: 30px;">
             <div class="price-option">
                 <div class="price-label">Standard (24h)</div>
@@ -1261,25 +1259,26 @@ function showServiceDetails(serviceType) {
     
     document.getElementById('serviceDetailsContent').innerHTML = content;
     document.getElementById('serviceDetailsModal').classList.add('active');
-    currentService = serviceType;
 }
 
 function closeServiceDetails() {
     document.getElementById('serviceDetailsModal').classList.remove('active');
 }
 
-function closeServiceDetailsAndOrder() {
+function startOrder() {
     closeServiceDetails();
-    openModal(currentService);
+    openOrderModal();
 }
 
-function openModal(serviceType) {
-    currentService = serviceType;
-    const service = servicesData[serviceType];
+function openOrderModal() {
+    const service = servicesData[currentService];
     
     document.getElementById('modalTitle').textContent = `Zamów: ${service.title}`;
     document.getElementById('standardPrice').textContent = service.standardPrice + ' zł';
     document.getElementById('expressPrice').textContent = service.expressPrice + ' zł';
+    
+    currentStep = 1;
+    showStep(1);
     
     const questionsContainer = document.getElementById('serviceQuestions');
     questionsContainer.innerHTML = '<h3>Pytania pomocnicze</h3>';
@@ -1296,38 +1295,142 @@ function openModal(serviceType) {
         questionsContainer.appendChild(div);
     });
     
-    document.getElementById('orderForm').style.display = 'block';
-    document.getElementById('successMessage').classList.remove('active');
-    
     selectedDelivery = 'standard';
     document.querySelectorAll('.delivery-option').forEach(el => el.classList.remove('selected'));
     document.querySelector('.delivery-option').classList.add('selected');
     
-    updateTotalPrice();
     document.getElementById('orderModal').classList.add('active');
 }
 
 function closeModal() {
     document.getElementById('orderModal').classList.remove('active');
+    showStep(1);
 }
 
 function selectDelivery(type) {
     selectedDelivery = type;
     document.querySelectorAll('.delivery-option').forEach(el => el.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
-    updateTotalPrice();
 }
 
-function updateTotalPrice() {
-    if (!currentService) return;
+function showStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + step).classList.add('active');
+    
+    document.querySelectorAll('.progress-step').forEach((s, i) => {
+        s.classList.remove('active', 'completed');
+        if (i + 1 < step) s.classList.add('completed');
+        if (i + 1 === step) s.classList.add('active');
+    });
+    
+    currentStep = step;
+    
+    if (step === 3) {
+        setupStripePayment();
+        updatePaymentSummary();
+    }
+}
+
+function nextStep(step) {
+    if (step === 2) {
+        showStep(2);
+    } else if (step === 3) {
+        const form = document.getElementById('analysisForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        showStep(3);
+    }
+}
+
+async function setupStripePayment() {
+    if (cardElement) return;
+    
+    const elements = stripe.elements();
+    cardElement = elements.create('card', {
+        style: {
+            base: {
+                color: '#f5f5f5',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#b8b8b8'
+                }
+            }
+        }
+    });
+    
+    cardElement.mount('#card-element');
+    
+    cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+    
     const service = servicesData[currentService];
     const price = selectedDelivery === 'standard' ? service.standardPrice : service.expressPrice;
-    document.getElementById('totalPrice').value = price + ' zł';
+    
+    try {
+        const response = await fetch(`${API_URL}/create-payment-intent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: price })
+        });
+        
+        const data = await response.json();
+        clientSecret = data.clientSecret;
+        
+        document.getElementById('submit-payment').addEventListener('click', handlePayment);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Błąd inicjalizacji płatności. Spróbuj ponownie.');
+    }
 }
 
-document.getElementById('analysisForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+function updatePaymentSummary() {
+    const service = servicesData[currentService];
+    const price = selectedDelivery === 'standard' ? service.standardPrice : service.expressPrice;
+    const deliveryText = selectedDelivery === 'standard' ? 'Standard (24h)' : 'Ekspres (2h)';
     
+    document.getElementById('summaryService').textContent = service.title;
+    document.getElementById('summaryDelivery').textContent = deliveryText;
+    document.getElementById('summaryPrice').textContent = price;
+}
+
+async function handlePayment() {
+    const button = document.getElementById('submit-payment');
+    button.disabled = true;
+    document.getElementById('button-text').style.display = 'none';
+    document.getElementById('spinner').style.display = 'inline';
+    
+    try {
+        const {error, paymentIntent} = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: cardElement
+            }
+        });
+        
+        if (error) {
+            throw new Error(error.message);
+        }
+        
+        if (paymentIntent.status === 'succeeded') {
+            await submitOrder(paymentIntent.id);
+        }
+    } catch (error) {
+        console.error('Payment error:', error);
+        alert('Błąd płatności: ' + error.message);
+        button.disabled = false;
+        document.getElementById('button-text').style.display = 'inline';
+        document.getElementById('spinner').style.display = 'none';
+    }
+}
+
+async function submitOrder(paymentIntentId) {
     const service = servicesData[currentService];
     const price = selectedDelivery === 'standard' ? service.standardPrice : service.expressPrice;
     
@@ -1338,6 +1441,7 @@ document.getElementById('analysisForm').addEventListener('submit', async functio
         serviceTitle: service.title,
         delivery: selectedDelivery,
         price: price,
+        paymentIntentId: paymentIntentId,
         personalInfo: {
             name: document.getElementById('fullName').value,
             email: document.getElementById('email').value,
@@ -1352,38 +1456,24 @@ document.getElementById('analysisForm').addEventListener('submit', async functio
         orderData.answers[q.id] = document.getElementById(q.id).value;
     });
     
-    console.log('ZAMÓWIENIE:', orderData);
-    
     try {
         await fetch(`${API_URL}/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderData)
         });
+        
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('successMessage').classList.add('active');
+        document.getElementById('orderNumber').textContent = orderData.orderNumber;
+        document.getElementById('confirmEmail').textContent = orderData.personalInfo.email;
+        document.getElementById('deliveryInfo').textContent = selectedDelivery === 'standard' ? 'do 24 godzin' : 'do 2 godzin';
+        
     } catch (error) {
-        console.error('Błąd:', error);
+        console.error('Order error:', error);
+        alert('Błąd zapisywania zamówienia. Skontaktuj się z nami.');
     }
-    
-    document.getElementById('orderForm').style.display = 'none';
-    document.getElementById('successMessage').classList.add('active');
-    document.getElementById('orderNumber').textContent = orderData.orderNumber;
-    document.getElementById('confirmEmail').textContent = orderData.personalInfo.email;
-    document.getElementById('deliveryInfo').textContent = selectedDelivery === 'standard' ? 'do 24 godzin' : 'do 2 godzin';
-});
-
-document.getElementById('cardNumber')?.addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\s/g, '');
-    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-    e.target.value = formattedValue;
-});
-
-document.getElementById('cardExpiry')?.addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length >= 2) {
-        value = value.slice(0, 2) + '/' + value.slice(2, 4);
-    }
-    e.target.value = value;
-});
+}
 
 function openPrivacyPolicy() {
     document.getElementById('privacyModal').classList.add('active');
@@ -1410,14 +1500,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
-
-window.onclick = function(event) {
-    const orderModal = document.getElementById('orderModal');
-    const detailsModal = document.getElementById('serviceDetailsModal');
-    
-    if (event.target === orderModal) closeModal();
-    if (event.target === detailsModal) closeServiceDetails();
-}
 
 console.log('%c🌟 ASTROBIZNES.PRO 🌟', 'font-size: 24px; font-weight: bold; color: #d4a574;');
 console.log('Gwiazdy prowadzą. My pomagamy je odczytać. ⭐');

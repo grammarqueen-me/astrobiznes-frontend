@@ -880,9 +880,9 @@
             <span class="close-modal" onclick="closeModal()">×</span>
             
             <div class="progress-steps">
-                <div class="progress-step" id="step1Indicator">1. Opcje dostawy</div>
-                <div class="progress-step" id="step2Indicator">2. Dane i pytania</div>
-                <div class="progress-step" id="step3Indicator">3. Płatność</div>
+                <div class="progress-step" id="step1Indicator" onclick="goToStep(1)" style="cursor: pointer;">1. Opcje dostawy</div>
+                <div class="progress-step" id="step2Indicator" onclick="goToStep(2)" style="cursor: pointer;">2. Dane i pytania</div>
+                <div class="progress-step" id="step3Indicator" onclick="goToStep(3)" style="cursor: pointer;">3. Płatność</div>
             </div>
 
             <!-- Step 1: Delivery Selection -->
@@ -1328,6 +1328,26 @@ function showStep(step) {
     if (step === 3) {
         setupStripePayment();
         updatePaymentSummary();
+    }
+}
+
+function goToStep(step) {
+    // Pozwól cofać się bez walidacji
+    if (step < currentStep) {
+        showStep(step);
+        return;
+    }
+    
+    // Do przodu - waliduj
+    if (step === 2) {
+        showStep(2);
+    } else if (step === 3) {
+        const form = document.getElementById('analysisForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        showStep(3);
     }
 }
 

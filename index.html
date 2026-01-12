@@ -6,9 +6,9 @@
     <title>AstroBiznes.Pro - Profesjonalna Astrologia Biznesowa</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="logo.svg">
-    <link rel="alternate icon" href="favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="visuals/logo.svg">
+    <link rel="alternate icon" href="visuals/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="visuals/apple-touch-icon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -677,7 +677,7 @@
     <nav>
         <div class="container">
             <div class="logo">
-                <img src="logo.svg" alt="AstroBiznes" style="height: 40px; vertical-align: middle; margin-right: 15px;">
+                <img src="visuals/logo.svg" alt="AstroBiznes" style="height: 40px; vertical-align: middle; margin-right: 15px;">
                 ASTROBIZNES.PRO
             </div>
             <ul class="nav-links">
@@ -856,7 +856,7 @@
 
     <footer>
         <div class="container">
-            <img src="logo.svg" alt="AstroBiznes" style="height: 50px; margin-bottom: 20px; opacity: 0.6;">
+            <img src="visuals/logo.svg" alt="AstroBiznes" style="height: 50px; margin-bottom: 20px; opacity: 0.6;">
             <p style="font-size: 1.1rem; margin-bottom: 20px;">© 2026 AstroBiznes.Pro - Wszelkie prawa zastrzeżone</p>
             <p style="opacity: 0.6; font-size: 0.9rem; margin-bottom: 20px;">Profesjonalna astrologia biznesowa | Zaawansowana analiza AI</p>
             
@@ -1029,14 +1029,14 @@
             <!-- Success Message -->
             <div class="success-message" id="successMessage">
                 <div class="success-icon">✓</div>
-                <h3>Płatność Potwierdzona!</h3>
+                <h3>PŁATNOŚĆ ZAKOŃCZONA SUKCESEM</h3>
                 <p>Twoje zamówienie zostało zarejestrowane pod numerem <strong id="orderNumber"></strong>.</p>
-                <p style="margin-top: 20px;">Otrzymasz email z potwierdzeniem na adres: <strong id="confirmEmail"></strong></p>
+                <p style="margin-top: 20px;">Za moment otrzymasz email z potwierdzeniem na adres: <strong id="confirmEmail"></strong></p>
                 <p style="margin-top: 20px; color: var(--gold); font-size: 1.3rem;">
                     <strong>Dostawa: <span id="deliveryInfo"></span></strong>
                 </p>
                 <p style="margin-top: 30px; opacity: 0.8;">
-                    Twoja szczegółowa analiza astrologiczna zostanie przygotowana przez naszych ekspertów i wysłana na podany adres email.
+                    Twoja szczegółowa analiza astrologiczna zostanie przygotowana przez naszych ekspertów i wysłana na podany adres email w przewidzianym terminie.
                 </p>
                 <button class="btn" onclick="closeModal()" style="max-width: 300px; margin: 40px auto 0;">Zamknij</button>
             </div>
@@ -1044,8 +1044,8 @@
     </div>
 
     <script>
-const API_URL = 'https://astrobiznes-pro-production.up.railway.app/api';
-const STRIPE_KEY = 'pk_live_51So0sBEr4XypIDmPLIeH3SMrK0afzlS5fImkXMm9TLrzI9l6I2xxmfRIvx9CLDauW0eB7pClbb2EDIiEfEpTnQLN002USmcoMG';
+const API_URL = 'http://localhost:3000/api';
+const STRIPE_KEY = 'pk_test_51So0sBEr4XypIDmPUBuwlt5xLLZHkB1IgacGAmKVKE6b5jE7DLQsoqrMPLIF8e9lVnzR1F2wBifABnNTvkHKLhs400BdJwbfWj';
 
 const stripe = Stripe(STRIPE_KEY);
 let cardElement;

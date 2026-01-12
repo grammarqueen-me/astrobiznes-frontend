@@ -1018,12 +1018,22 @@
     <label style="display: block; margin-bottom: 5px; color: #b8b8b8;">
         Kod rabatowy (opcjonalnie)
     </label>
-    <input 
-        type="text" 
-        id="discountCode" 
-        placeholder="Wpisz kod rabatowy"
-        style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px; color: #f5f5f5;"
-    >
+    <div style="display: flex; gap: 10px;">
+        <input 
+            type="text" 
+            id="discountCode" 
+            placeholder="Wpisz kod rabatowy"
+            style="flex: 1; padding: 12px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px; color: #f5f5f5;"
+        >
+        <button 
+            type="button"
+            onclick="applyDiscountCode()"
+            style="padding: 12px 24px; background: #d4a574; color: #0d0d0d; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap;"
+        >
+            Zastosuj
+        </button>
+    </div>
+    <div id="discountMessage" style="margin-top: 8px; font-size: 14px;"></div>
 </div>
 
 <!-- Stripe Card Element -->
@@ -1460,8 +1470,7 @@ async function setupStripePayment() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                amount: price,
-                discountCode: discountCode || null
+                amount: finalPrice
             })
         });
         
@@ -1599,6 +1608,67 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 console.log('%c🌟 ASTROBIZNES.PRO 🌟', 'font-size: 24px; font-weight: bold; color: #d4a574;');
 console.log('Gwiazdy prowadzą. My pomagamy je odczytać. ⭐');
+
+let appliedDiscount = false;
+let discountedPrice = null;
+
+async function applyDiscountCode() {
+    const codeInput = document.getElementById('discountCode');
+    const messageDiv = document.getElementById('discountMessage');
+    const code = codeInput.value.trim();
+    
+    if (!code) {
+        messageDiv.style.color = '#ff6b6b';
+        messageDiv.textContent = 'Wpisz kod rabatowy';
+        return;
+    }
+    
+    messageDiv.textContent = 'Sprawdzanie...';
+    messageDiv.style.color = '#b8b8b8';
+    
+    try {
+        const response = await fetch(`${API_URL}/validate-discount`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                discountCode: code,
+                originalPrice: selectedPrice
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.valid) {
+            appliedDiscount = true;
+            discountedPrice = result.newPrice;
+            messageDiv.style.color = '#4ade80';
+            messageDiv.textContent = '✓ ' + result.message;
+            
+            // Zaktualizuj wyświetlaną cenę
+            updateDisplayedPrice(result.newPrice);
+        } else {
+            appliedDiscount = false;
+            discountedPrice = null;
+            messageDiv.style.color = '#ff6b6b';
+            messageDiv.textContent = '✗ ' + result.message;
+        }
+    } catch (error) {
+        messageDiv.style.color = '#ff6b6b';
+        messageDiv.textContent = 'Błąd sprawdzania kodu';
+        console.error('Discount error:', error);
+    }
+}
+
+function updateDisplayedPrice(newPrice) {
+    // Znajdź element z ceną i zaktualizuj
+    const priceElements = document.querySelectorAll('.price, [class*="price"]');
+    priceElements.forEach(el => {
+        if (el.textContent.includes('zł')) {
+            el.textContent = `${newPrice} zł`;
+        }
+    });
+}
+
     </script>
 </body>
 </html>

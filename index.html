@@ -1326,12 +1326,22 @@ function openOrderModal() {
     service.questions.forEach(q => {
         const div = document.createElement('div');
         div.className = 'form-group';
-        div.innerHTML = `
-            <label>${q.label}</label>
-            ${q.type === 'textarea' 
-                ? `<textarea id="${q.id}" required></textarea>` 
-                : `<input type="text" id="${q.id}" required>`}
-        `;
+        
+        if (q.type === 'textarea') {
+            div.innerHTML = `
+                <label>${q.label}</label>
+                <textarea id="${q.id}" required maxlength="1000" oninput="updateCharCount('${q.id}')"></textarea>
+                <div style="text-align: right; font-size: 0.85rem; color: var(--text-gray); margin-top: 5px;">
+                    <span id="${q.id}-count">0</span> / 1000 znaków (max ~200 słów)
+                </div>
+            `;
+        } else {
+            div.innerHTML = `
+                <label>${q.label}</label>
+                <input type="text" id="${q.id}" required>
+            `;
+        }
+        
         questionsContainer.appendChild(div);
     });
     
@@ -1436,6 +1446,20 @@ function nextStep(step) {
             form.reportValidity();
             return;
         }
+        
+        // Sprawdź limity textarea
+        const service = servicesData[currentService];
+        for (const q of service.questions) {
+            if (q.type === 'textarea') {
+                const field = document.getElementById(q.id);
+                if (field.value.length > 1000) {
+                    alert(`Pole "${q.label}" przekracza limit 1000 znaków!`);
+                    field.focus();
+                    return;
+                }
+            }
+        }
+        
         showStep(3);
     }
 }
@@ -1754,6 +1778,24 @@ function updateDisplayedPrice(newPrice) {
     });
 }
 
+function updateCharCount(fieldId) {
+    const textarea = document.getElementById(fieldId);
+    const counter = document.getElementById(fieldId + '-count');
+    
+    if (textarea && counter) {
+        const length = textarea.value.length;
+        counter.textContent = length;
+        
+        // Zmień kolor gdy blisko limitu
+        if (length > 950) {
+            counter.style.color = '#ff6b6b';  // Czerwony
+        } else if (length > 800) {
+            counter.style.color = '#ffa94d';  // Pomarańczowy
+        } else {
+            counter.style.color = 'var(--text-gray)';  // Normalny
+        }
+    }
+}
     </script>
 </body>
 </html>

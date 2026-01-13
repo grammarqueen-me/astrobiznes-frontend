@@ -1336,14 +1336,21 @@ function openOrderModal() {
                 </div>
             `;
         } else {
-            div.innerHTML = `
-                <label>${q.label}</label>
-                <input type="text" id="${q.id}" required>
-            `;
-        }
-        
-        questionsContainer.appendChild(div);
-    });
+        div.innerHTML = `
+            <label>${q.label}</label>
+            <input type="text" id="${q.id}" required maxlength="50">
+            <div style="text-align: right; font-size: 0.85rem; color: var(--text-gray); margin-top: 5px;">
+                <span id="${q.id}-count">0</span> / 50 znaków
+            </div>
+        `;
+    }
+    
+    questionsContainer.appendChild(div);
+    
+    // Dodaj event listener
+    const field = document.getElementById(q.id);
+    field.addEventListener('input', () => updateCharCount(q.id));
+});
     
     selectedDelivery = 'standard';
     document.querySelectorAll('.delivery-option').forEach(el => el.classList.remove('selected'));
@@ -1447,16 +1454,16 @@ function nextStep(step) {
             return;
         }
         
-        // Sprawdź limity textarea
+        // Sprawdź limity wszystkich pól
         const service = servicesData[currentService];
         for (const q of service.questions) {
-            if (q.type === 'textarea') {
-                const field = document.getElementById(q.id);
-                if (field.value.length > 1000) {
-                    alert(`Pole "${q.label}" przekracza limit 1000 znaków!`);
-                    field.focus();
-                    return;
-                }
+            const field = document.getElementById(q.id);
+            const maxLength = q.type === 'textarea' ? 1000 : 50;
+            
+            if (field.value.length > maxLength) {
+                alert(`Pole "${q.label}" przekracza limit ${maxLength} znaków!`);
+                field.focus();
+                return;
             }
         }
         
@@ -1779,17 +1786,20 @@ function updateDisplayedPrice(newPrice) {
 }
 
 function updateCharCount(fieldId) {
-    const textarea = document.getElementById(fieldId);
+    const field = document.getElementById(fieldId);
     const counter = document.getElementById(fieldId + '-count');
     
-    if (textarea && counter) {
-        const length = textarea.value.length;
+    if (field && counter) {
+        const length = field.value.length;
+        const maxLength = parseInt(field.getAttribute('maxlength')) || 1000;
+        
         counter.textContent = length;
         
         // Zmień kolor gdy blisko limitu
-        if (length > 950) {
+        const percentage = length / maxLength;
+        if (percentage > 0.95) {
             counter.style.color = '#ff6b6b';  // Czerwony
-        } else if (length > 800) {
+        } else if (percentage > 0.8) {
             counter.style.color = '#ffa94d';  // Pomarańczowy
         } else {
             counter.style.color = 'var(--text-gray)';  // Normalny

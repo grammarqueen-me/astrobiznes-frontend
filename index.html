@@ -951,12 +951,6 @@
             <!-- Step 3: Payment -->
             <div class="step" id="step3">
                 <h2>Płatność</h2>
-                <div style="background: var(--medium-gray); padding: 30px; margin-bottom: 30px; border-left: 4px solid var(--gold);">
-                    <h3 style="margin-top: 0;">Podsumowanie zamówienia</h3>
-                    <p><strong>Usługa:</strong> <span id="summaryService"></span></p>
-                    <p><strong>Dostawa:</strong> <span id="summaryDelivery"></span></p>
-                    <p style="font-size: 1.5rem; color: var(--gold); margin-top: 20px;"><strong>Do zapłaty: <span id="summaryPrice"></span> zł</strong></p>
-                </div>
 
 <h3>Dane do płatności</h3>
 
@@ -1044,6 +1038,17 @@
 <div style="margin-top: 20px; text-align: center;">
     <iframe width="380" height="38" style="border:0;" src="https://climate.stripe.com/badge/AYJMQo?theme=dark&size=small&locale=en-GB"></iframe>
 </div>
+
+<!-- Summary Box - PRZED przyciskiem płatności -->
+<div style="background: var(--medium-gray); padding: 20px; margin: 30px 0 20px 0; border-left: 4px solid var(--gold);">
+    <h3 style="margin: 0 0 15px 0; font-size: 1.3rem;">Podsumowanie</h3>
+    <p style="margin: 5px 0;"><strong>Usługa:</strong> <span id="summaryService"></span></p>
+    <p style="margin: 5px 0;"><strong>Dostawa:</strong> <span id="summaryDelivery"></span></p>
+    <p style="margin: 5px 0;"><strong>Cena:</strong> <span id="summaryPrice"></span></p>
+    <p style="font-size: 1.4rem; color: var(--gold); margin: 15px 0 0 0; padding-top: 15px; border-top: 1px solid var(--light-gray);"><strong>Razem: <span id="summaryFinal"></span></strong></p>
+</div>
+
+<button id="submit-payment" class="btn" style="margin-top: 30px;">
 
                 <button id="submit-payment" class="btn" style="margin-top: 30px;">
                     <span id="button-text">Zapłać i zamów</span>
@@ -1370,6 +1375,10 @@ function toggleInvoiceFields() {
         postalInput.required = false;
         cityInput.required = false;
     }
+        // Zaktualizuj summary po zmianie VAT
+    if (currentStep === 3) {
+        updatePaymentSummary();
+    }
 }
 
 function selectDelivery(type) {
@@ -1432,6 +1441,29 @@ function nextStep(step) {
     }
 }
 
+function calculateFinalPrice() {
+    const service = servicesData[currentService];
+    let basePrice = selectedDelivery === 'standard' ? service.standardPrice : service.expressPrice;
+    
+    // Zastosuj discount jeśli jest
+    if (appliedDiscount && discountedPrice) {
+        basePrice = discountedPrice;
+    }
+    
+    // Dodaj VAT jeśli checkbox zaznaczony
+    const wantsInvoice = document.getElementById('wantInvoice').checked;
+    const vatAmount = wantsInvoice ? Math.round(basePrice * 0.23) : 0;
+    const finalPrice = basePrice + vatAmount;
+    
+    return {
+        basePrice,
+        vatAmount,
+        finalPrice,
+        hasDiscount: appliedDiscount && discountedPrice,
+        hasVAT: wantsInvoice
+    };
+}
+
 async function setupStripePayment() {
     if (cardElement) return;
     
@@ -1460,17 +1492,14 @@ async function setupStripePayment() {
         }
     });
     
-    const service = servicesData[currentService];
-    const price = selectedDelivery === 'standard' ? service.standardPrice : service.expressPrice;
+    const priceDetails = calculateFinalPrice();
     
     try {
-        const discountCode = document.getElementById('discountCode').value.trim();
-
         const response = await fetch(`${API_URL}/create-payment-intent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                amount: price
+                amount: priceDetails.finalPrice
             })
         });
         
@@ -1486,12 +1515,27 @@ async function setupStripePayment() {
 
 function updatePaymentSummary() {
     const service = servicesData[currentService];
-    const price = selectedDelivery === 'standard' ? service.standardPrice : service.expressPrice;
     const deliveryText = selectedDelivery === 'standard' ? 'Standard (24h)' : 'Ekspres (2h)';
+    const priceDetails = calculateFinalPrice();
     
     document.getElementById('summaryService').textContent = service.title;
     document.getElementById('summaryDelivery').textContent = deliveryText;
-    document.getElementById('summaryPrice').textContent = price;
+    
+    // Wyświetl szczegóły ceny
+    let priceHTML = '';
+    
+    if (priceDetails.hasDiscount) {
+        priceHTML += `<span style="text-decoration: line-through; opacity: 0.5;">${selectedDelivery === 'standard' ? service.standardPrice : service.expressPrice} zł</span> → `;
+    }
+    
+    priceHTML += `${priceDetails.basePrice} zł`;
+    
+    if (priceDetails.hasVAT) {
+        priceHTML += ` + VAT (${priceDetails.vatAmount} zł)`;
+    }
+    
+    document.getElementById('summaryPrice').innerHTML = priceHTML;
+    document.getElementById('summaryFinal').textContent = priceDetails.finalPrice + ' zł';
 }
 
 async function handlePayment() {
@@ -1646,10 +1690,10 @@ async function applyDiscountCode() {
             appliedDiscount = true;
             discountedPrice = result.newPrice;
             messageDiv.style.color = '#4ade80';
-            messageDiv.textContent = '✓ ' + result.message;
+            messageDiv.textContent = '✓ Kod rabatowy zastosowany!';
             
-            // Zaktualizuj wyświetlaną cenę
-            updateDisplayedPrice(result.newPrice);
+            // Zaktualizuj summary
+            updatePaymentSummary();
         } else {
             appliedDiscount = false;
             discountedPrice = null;

@@ -923,6 +923,34 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Forma zwrotu *</label>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label style="font-weight: normal; cursor: pointer;">
+                                <input type="radio" name="pronouns" value="on" checked onchange="toggleCustomPronouns()">
+                                on (męska)
+                            </label>
+                            <label style="font-weight: normal; cursor: pointer;">
+                                <input type="radio" name="pronouns" value="ona" onchange="toggleCustomPronouns()">
+                                ona (żeńska)
+                            </label>
+                            <label style="font-weight: normal; cursor: pointer;">
+                                <input type="radio" name="pronouns" value="custom" onchange="toggleCustomPronouns()">
+                                inaczej
+                            </label>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="customPronouns" 
+                            placeholder="np. one/ich, osoba neutralna" 
+                            maxlength="50"
+                            style="margin-top: 10px; display: none;"
+                        >
+                        <div style="text-align: right; font-size: 0.85rem; color: var(--text-gray); margin-top: 5px; display: none;" id="pronouns-count-container">
+                            <span id="pronouns-count">0</span> / 50 znaków
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label>Email *</label>
                         <input type="email" id="email" required>
                     </div>
@@ -1666,6 +1694,7 @@ async function submitOrder(paymentIntentId) {
         paymentIntentId: paymentIntentId,
         personalInfo: {
             name: document.getElementById('fullName').value,
+            pronouns: getPronounsValue(),
             email: document.getElementById('email').value,
             birthDate: document.getElementById('birthDate').value,
             birthTime: document.getElementById('birthTime').value || 'Nieznana',
@@ -1718,6 +1747,74 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 console.log('%c🌟 ASTROBIZNES.PRO 🌟', 'font-size: 24px; font-weight: bold; color: #d4a574;');
 console.log('Gwiazdy prowadzą. My pomagamy je odczytać. ⭐');
+
+function toggleCustomPronouns() {
+    const customRadio = document.querySelector('input[name="pronouns"][value="custom"]');
+    const customInput = document.getElementById('customPronouns');
+    const counterContainer = document.getElementById('pronouns-count-container');
+    
+    if (customRadio.checked) {
+        customInput.style.display = 'block';
+        counterContainer.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        counterContainer.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Dodaj listener dla countera
+document.addEventListener('DOMContentLoaded', function() {
+    const customInput = document.getElementById('customPronouns');
+    if (customInput) {
+        customInput.addEventListener('input', () => {
+            document.getElementById('pronouns-count').textContent = customInput.value.length;
+        });
+    }
+});
+
+function getPronounsValue() {
+    const selected = document.querySelector('input[name="pronouns"]:checked').value;
+    if (selected === 'custom') {
+        return document.getElementById('customPronouns').value || 'osoba';
+    }
+    return selected;
+}function toggleCustomPronouns() {
+    const customRadio = document.querySelector('input[name="pronouns"][value="custom"]');
+    const customInput = document.getElementById('customPronouns');
+    const counterContainer = document.getElementById('pronouns-count-container');
+    
+    if (customRadio.checked) {
+        customInput.style.display = 'block';
+        counterContainer.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        counterContainer.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Dodaj listener dla countera
+document.addEventListener('DOMContentLoaded', function() {
+    const customInput = document.getElementById('customPronouns');
+    if (customInput) {
+        customInput.addEventListener('input', () => {
+            document.getElementById('pronouns-count').textContent = customInput.value.length;
+        });
+    }
+});
+
+function getPronounsValue() {
+    const selected = document.querySelector('input[name="pronouns"]:checked').value;
+    if (selected === 'custom') {
+        return document.getElementById('customPronouns').value || 'osoba';
+    }
+    return selected;
+}
 
 let appliedDiscount = false;
 let discountedPrice = null;
@@ -1806,6 +1903,7 @@ function updateCharCount(fieldId) {
         }
     }
 }
+
     </script>
 </body>
 </html>

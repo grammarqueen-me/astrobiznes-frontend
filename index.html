@@ -1628,6 +1628,11 @@ function updatePaymentSummary() {
 }
 
 async function handlePayment() {
+    console.log('=== HANDLE PAYMENT DEBUG ===');
+    console.log('elements:', elements);
+    console.log('clientSecret:', clientSecret);
+    console.log('============================');
+
     const button = document.getElementById('submit-payment');
     const buttonText = document.getElementById('button-text');
     const spinner = document.getElementById('spinner');

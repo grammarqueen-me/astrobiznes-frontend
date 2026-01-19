@@ -1520,8 +1520,14 @@ async function setupStripePayment() {
     
     try {
         // KROK 1: Stwórz elements BEZ clientSecret (na razie pusty)
+
+        const priceDetails = calculateFinalPrice();
+
         elements = stripe.elements({
             locale: 'pl',  // Polski!
+            mode: 'payment',
+            amount: priceDetails.finalPrice * 100,  // w groszach
+            currency: 'pln',
             appearance: {
                 theme: 'night',
                 variables: {
@@ -1639,6 +1645,14 @@ async function handlePayment() {
         
         // KROK KRYTYCZNY: Oblicz finalną cenę
         const priceDetails = calculateFinalPrice();
+
+        // UPDATE elements z finalną ceną (na wypadek zmiany rabatu/VAT)
+        elements.update({
+            amount: priceDetails.finalPrice * 100,
+            currency: 'pln'
+        });
+        console.log('✓ Elements updated with final amount');
+
         console.log('=== CREATING PAYMENT INTENT ===');
         console.log('Amount:', priceDetails.finalPrice, 'PLN');
         console.log('Base:', priceDetails.basePrice, 'PLN');
@@ -1697,7 +1711,7 @@ async function handlePayment() {
         console.log('✓ Payment successful:', paymentIntent.id);
         console.log('✓ Amount charged:', paymentIntent.amount / 100, 'PLN');
         console.log('✓ Currency:', paymentIntent.currency.toUpperCase());
-        
+
         // ZAPIS ZAMÓWIENIA
         try {
             await submitOrder(paymentIntent.id);

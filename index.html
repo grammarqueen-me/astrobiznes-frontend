@@ -1784,14 +1784,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function getPronounsValue() {
-    const selected = document.querySelector('input[name="pronouns"]:checked').value;
-    if (selected === 'custom') {
-        return document.getElementById('customPronouns').value || 'osoba';
-    }
-    return selected;
-}
-
 let appliedDiscount = false;
 let discountedPrice = null;
 

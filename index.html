@@ -1065,6 +1065,23 @@
     <p style="font-size: 1.4rem; color: var(--gold); margin: 15px 0 0 0; padding-top: 15px; border-top: 1px solid var(--light-gray);"><strong>Razem: <span id="summaryFinal"></span></strong></p>
 </div>
 
+                <!-- Akceptacja regulaminu -->
+                <div style="margin-top: 30px; padding: 20px; background: var(--medium-gray); border-left: 3px solid var(--gold);">
+                    <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-size: 0.95rem;">
+                        <input 
+                            type="checkbox" 
+                            id="acceptTerms" 
+                            required
+                            style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
+                        >
+                        <span>
+                            Akceptuję <a href="terms.html" target="_blank" style="color: var(--gold); text-decoration: underline;">Regulamin</a> 
+                            oraz <a href="privacy.html" target="_blank" style="color: var(--gold); text-decoration: underline;">Politykę Prywatności</a> 
+                            i wyrażam zgodę na przetwarzanie moich danych osobowych w celu realizacji zamówienia. *
+                        </span>
+                    </label>
+                </div>
+
                 <button id="submit-payment" class="btn" style="margin-top: 30px;">
                     <span id="button-text">Zapłać i zamów</span>
                     <span id="spinner" style="display: none;">⏳ Przetwarzanie...</span>

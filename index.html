@@ -1646,6 +1646,11 @@ async function handlePayment() {
     spinner.style.display = 'inline';
     
     try {
+        const termsCheckbox = document.getElementById('acceptTerms');
+        if (!termsCheckbox || !termsCheckbox.checked) {
+            throw new Error('Musisz zaakceptować Regulamin i Politykę Prywatności');
+        }
+
         console.log('=== PRE-PAYMENT VALIDATION ===');
         
         // Sprawdź pronouns

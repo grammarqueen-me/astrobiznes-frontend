@@ -1123,7 +1123,6 @@ career: {
 
 Łączymy klasyczną astrologię z praktycznym doświadczeniem biznesowym — otrzymujesz nie ogólniki, ale konkretne daty działań, strategię opartą na Twoich naturalnych predyspozycjach oraz mapę wyzwań i szans w najbliższych miesiącach.`,
         forWhom: `KOMU TO POMOŻE:
-
 • Negocjujesz podwyżkę lub awans — dowiesz się, kiedy Twoja pozycja negocjacyjna będzie najsilniejsza i jak ją wykorzystać
 • Rozważasz zmianę pracy lub branży — otrzymasz timing na działania (kiedy wysyłać CV, kiedy rozmawiać z rekruterami, kiedy podpisywać umowę) oraz ocenę czy to dobry moment na zmianę
 • Stawiasz na rozwój w obecnej firmie — zobaczysz okna na podnoszenie kompetencji, budowanie relacji z kluczowymi osobami, zwiększanie widoczności
@@ -1131,7 +1130,6 @@ career: {
 • Czujesz stagnację — analiza pokaże Twoje niewykorzystane mocne strony i kierunki rozwoju zgodne z naturalnymi predyspozycjami`,
 
         whatYouGet: `CO DOKŁADNIE OTRZYMASZ (2500-3000 słów):
-
 I. PROFIL ZAWODOWY
 Twoje naturalne mocne strony w kontekście kariery (co robisz najlepiej), obszary do rozwoju, optymalny styl pracy i środowisko zawodowe. Wszystko oparte na pozycjach planet w Twoim horoskopie urodzeniowym.
 
@@ -1350,34 +1348,38 @@ function showServiceDetails(serviceType) {
     currentService = serviceType;
     const service = servicesData[serviceType];
     const content = `
-        <h2 style="color: var(--gold); margin-bottom: 25px;">${service.title}</h2>  
+        <h2 style="color: var(--gold); margin-bottom: 15px;">${service.title}</h2>
+        
         ${service.detailedDescription.main ? 
-            `<p style="margin-bottom: 30px; font-size: 1.05rem; line-height: 1.8; color: var(--text-gray);">${service.detailedDescription.main}</p>` 
+            `<p style="margin-bottom: 25px; font-size: 1.05rem; line-height: 1.8; color: var(--text-gray);">${service.detailedDescription.main.trim()}</p>` 
             : ''
         }
+        
         <div style="margin-bottom: 30px;">
             <h3 style="color: var(--gold); margin-bottom: 8px; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px;">
                 ${service.detailedDescription.forWhom.split('\n')[0]}
             </h3>
             <div style="white-space: pre-line; line-height: 1.8; color: var(--text-gray);">
-                ${service.detailedDescription.forWhom.split('\n').slice(1).join('\n')}
+                ${service.detailedDescription.forWhom.split('\n').slice(1).join('\n').trim()}
             </div>
         </div>
+        
         <div style="margin-bottom: 30px;">
             <h3 style="color: var(--gold); margin-bottom: 8px; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px;">
                 ${service.detailedDescription.whatYouGet.split('\n')[0]}
             </h3>
             <div style="white-space: pre-line; line-height: 1.8; color: var(--text-gray);">
-                ${service.detailedDescription.whatYouGet.split('\n').slice(1).join('\n')}
+                ${service.detailedDescription.whatYouGet.split('\n').slice(1).join('\n').trim()}
             </div>
         </div>
+        
         ${service.detailedDescription.keyPoints ? 
             `<div style="background: var(--medium-gray); padding: 25px; border-left: 4px solid var(--gold); margin: 30px 0;">
                 <h3 style="color: var(--gold); margin: 0 0 8px 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;">
                     ${service.detailedDescription.keyPoints.split('\n')[0]}
                 </h3>
                 <div style="white-space: pre-line; line-height: 1.8; color: var(--text-gray);">
-                    ${service.detailedDescription.keyPoints.split('\n').slice(1).join('\n')}
+                    ${service.detailedDescription.keyPoints.split('\n').slice(1).join('\n').trim()}
                 </div>
             </div>` 
             : ''
@@ -1386,6 +1388,7 @@ function showServiceDetails(serviceType) {
         <p style="text-align: center; color: var(--text-gray); margin: 30px 0; font-size: 0.95rem; font-style: italic;">
             ${service.detailedDescription.format}
         </p>
+        
         <div class="service-price" style="margin-top: 30px;">
             <div class="price-option">
                 <div class="price-label">Standard (24h)</div>
